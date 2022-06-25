@@ -3,6 +3,8 @@ import isEmailValid from "../utils/isEmailValid";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { createTokens } from "../utils/auth";
+import dotenv from "dotenv";
+dotenv.config();
 export const Register = async (req: Request, res: Response) => {
     interface IData {
         fullName: string;
@@ -57,8 +59,8 @@ export const Register = async (req: Request, res: Response) => {
         console.log(error);
     }
 };
-const SECRET = "JFBDSBJFBDHSBFDSbfjds@#%";
-const REFRESH_SECRET = "BVFHhbjhvfJHVHVvfjvhJKBjkbjkbjbj";
+const SECRET = process.env.SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 export const Login = async (req: Request, res: Response) => {
     interface IData {
         username: string;

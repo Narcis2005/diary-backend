@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/user";
 import { IJWTDecode, refreshTokens } from "../utils/auth";
-const SECRET = "JFBDSBJFBDHSBFDSbfjds@#%";
-const REFRESH_SECRET = "BVFHhbjhvfJHVHVvfjvhJKBjkbjkbjbj";
+import dotenv from "dotenv";
+dotenv.config();
+const SECRET = process.env.SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const addUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers["x-token"] as string;
     if (!token) {
