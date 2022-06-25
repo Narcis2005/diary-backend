@@ -11,6 +11,10 @@ export const Register = async (req: Request, res: Response) => {
         email: string;
     }
     const { fullName, username, password, email } = req.body as IData;
+    if (!fullName || !username || !password || !email) {
+        res.status(400).send({ message: "Specify all params" });
+        return;
+    }
     if (fullName.length < 3) {
         res.status(422).send({ message: "Write a valid full name" });
         return;
@@ -34,7 +38,7 @@ export const Register = async (req: Request, res: Response) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     try {
-        await User.create({
+        const user = await User.create({
             username,
             password: hashedPassword,
             email,
@@ -43,6 +47,10 @@ export const Register = async (req: Request, res: Response) => {
             updatedAt: new Date(),
             imagePath: "static/images/profilePlaceholder.png",
         });
+        const [token, refreshToken] = await createTokens(user, SECRET, REFRESH_SECRET + user.password);
+        res.set("Access-Control-Expose-Headers", "x-token, x-refresh-token");
+        res.set("x-token", token);
+        res.set("x-refresh-token", refreshToken);
         res.sendStatus(200);
     } catch (error) {
         res.status(500).send(error);
@@ -77,5 +85,26 @@ export const Login = async (req: Request, res: Response) => {
     res.set("x-token", token);
     res.set("x-refresh-token", refreshToken);
 
-    res.send({ message: "you are connected" });
+    res.send({
+        message: "you are connected",
+        id: user.id,
+        username: user.username,
+        fullName: user.fullName,
+        email: user.email,
+        imageURL: user.imagePath,
+    });
+};
+export const getUser = (req: Request, res: Response) => {
+    if (req.user) {
+        res.send({
+            message: "you are connected",
+            id: req.user.id,
+            username: req.user.username,
+            fullName: req.user.fullName,
+            email: req.user.email,
+            imageURL: req.user.imagePath,
+        });
+        return;
+    }
+    res.status(403).send({ message: "You could not be logged in" });
 };

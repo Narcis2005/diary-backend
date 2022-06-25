@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import express from "express";
-import { Login, Register } from "../../controllers/auth";
+import { getUser, Login, Register } from "../../controllers/auth";
 const router = express.Router();
 
-router.post("/router", void Register);
+router.post("/register", Register);
 
-router.post("/login", void Login);
+router.post("/login", Login);
+
+router.get("/getuser", getUser);
 export default router;

@@ -20,12 +20,12 @@ database.authenticate()
 
 app.use(addUser);
 app.use("/api/auth", authRouter);
-app.get("/api/test", privateEndpoint, (req, res) => {
-  res.send("esti logat");
+app.post("/api/test", privateEndpoint, (req, res) => {
+  res.send({message: "esti logat inca"});
 });
 //Creating port variable from env variable or setting it mannualy
 
-const PORT = process.env.PORT || 5010;
+const PORT = process.env.PORT || 3026;
 
 
 //Listening on the PORT variable and then console logging the port
