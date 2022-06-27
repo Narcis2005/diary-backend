@@ -93,7 +93,10 @@ export const Login = async (req: Request, res: Response) => {
         username: user.username,
         fullName: user.fullName,
         email: user.email,
-        imageURL: user.imagePath,
+        imageURL:
+            process.env.NODE_ENV === "production"
+                ? "https://diary.chirilovnarcis.ro/" + user.imagePath
+                : "http://localhost:3026/" + user.imagePath,
     });
 };
 export const getUser = (req: Request, res: Response) => {
@@ -104,9 +107,57 @@ export const getUser = (req: Request, res: Response) => {
             username: req.user.username,
             fullName: req.user.fullName,
             email: req.user.email,
-            imageURL: req.user.imagePath,
+            imageURL:
+                process.env.NODE_ENV === "production"
+                    ? "https://diary.chirilovnarcis.ro/" + req.user.imagePath
+                    : "http://localhost:3026/" + req.user.imagePath,
         });
         return;
     }
     res.status(403).send({ message: "You could not be logged in" });
+};
+export const Update = async (req: Request, res: Response) => {
+    interface IBody {
+        username: string;
+        email: string;
+        fullName: string;
+        imageName: string;
+    }
+    const { username, email, fullName, imageName } = req.body as IBody;
+    const user = await User.findByPk(req.user.id);
+    if (!username && !email && !fullName && !imageName) {
+        res.status(400).send({ message: "You need to update at least one information" });
+    }
+    if (username) {
+        if (username.length < 3) {
+            res.status(422).send({ message: "An username should be at least 3 charachters" });
+            return;
+        }
+        const findedUserByUsername = await User.findOne({ where: { username } });
+        if (findedUserByUsername && findedUserByUsername.id != req.user.id) {
+            res.status(400).send({ message: "An account with specified username aleardy exists" });
+            return;
+        }
+        user.username = username;
+    }
+    if (email) {
+        if (!isEmailValid(email)) {
+            res.status(422).send({ message: "Write a valid email address" });
+            return;
+        }
+        user.email = email;
+    }
+    if (fullName) {
+        if (fullName.length < 3) {
+            res.status(422).send({ message: "Write a valid full name" });
+            return;
+        }
+        user.fullName = fullName;
+    }
+    if (imageName) {
+        const imagePath = "static/images/" + imageName;
+        user.imagePath = imagePath;
+    }
+    await user.save();
+    res.sendStatus(200);
 };

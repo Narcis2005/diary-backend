@@ -3,6 +3,8 @@ import cors from 'cors';
 import database from './src/config/database';
 import addUser from './src/middleware/addUser';
 import authRouter from "./src/routes/authRouter";
+import uploadRouter from "./src/routes/uploads";
+
 import privateEndpoint from './src/middleware/privateEndpoint';
 import dotenv from "dotenv";
 dotenv.config();
@@ -36,9 +38,10 @@ database.authenticate()
   .then(() => console.log("connected to postgres"))
   .catch((err) => console.log(err));
 
-
+app.use('/static', express.static(__dirname +'/static'));
 app.use(addUser);
 app.use("/api/auth", authRouter);
+app.use("/api/upload", uploadRouter);
 app.post("/api/test", privateEndpoint, (req, res) => {
   res.send({message: "esti logat inca"});
 });
