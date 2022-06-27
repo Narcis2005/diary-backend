@@ -95,8 +95,8 @@ export const Login = async (req: Request, res: Response) => {
         email: user.email,
         imageURL:
             process.env.NODE_ENV === "production"
-                ? "https://diary.chirilovnarcis.ro/" + user.imagePath
-                : "http://localhost:3026/" + user.imagePath,
+                ? "https://diary.chirilovnarcis.ro/api/" + user.imagePath
+                : "http://localhost:3026/api/" + user.imagePath,
     });
 };
 export const getUser = (req: Request, res: Response) => {
@@ -109,8 +109,8 @@ export const getUser = (req: Request, res: Response) => {
             email: req.user.email,
             imageURL:
                 process.env.NODE_ENV === "production"
-                    ? "https://diary.chirilovnarcis.ro/" + req.user.imagePath
-                    : "http://localhost:3026/" + req.user.imagePath,
+                    ? "https://diary.chirilovnarcis.ro/api/" + req.user.imagePath
+                    : "http://localhost:3026/api/" + req.user.imagePath,
         });
         return;
     }

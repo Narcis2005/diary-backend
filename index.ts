@@ -38,7 +38,7 @@ database.authenticate()
   .then(() => console.log("connected to postgres"))
   .catch((err) => console.log(err));
 
-app.use('/static', express.static(__dirname +'/static'));
+app.use('/api/static', express.static(__dirname +'/static'));
 app.use(addUser);
 app.use("/api/auth", authRouter);
 app.use("/api/upload", uploadRouter);
