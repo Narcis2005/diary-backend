@@ -1,5 +1,17 @@
-import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import {
+    Association,
+    CreationOptional,
+    DataTypes,
+    HasManyCreateAssociationMixin,
+    HasManyGetAssociationsMixin,
+    HasManyHasAssociationMixin,
+    HasManyHasAssociationsMixin,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+} from "sequelize";
 import database from "../config/database";
+import DiaryEntry from "./diaryEntry";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
@@ -10,6 +22,13 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare updatedAt: Date;
     declare fullName: string;
     declare imagePath: string;
+    declare getDiaryEntries: HasManyGetAssociationsMixin<DiaryEntry>;
+    declare hasDiaryEntry: HasManyHasAssociationMixin<DiaryEntry, number>;
+    declare createDiaryEntry: HasManyCreateAssociationMixin<DiaryEntry, "userId">;
+    declare hasDiaryEntries: HasManyHasAssociationsMixin<DiaryEntry, number>;
+    declare static associations: {
+        diaryEntries: Association<User, DiaryEntry>;
+    };
 }
 User.init(
     {
@@ -46,5 +65,9 @@ User.init(
         sequelize: database,
     },
 );
-
+User.hasMany(DiaryEntry, {
+    sourceKey: "id",
+    foreignKey: "userId",
+    as: "diaryEntries",
+});
 export default User;

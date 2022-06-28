@@ -4,6 +4,7 @@ import database from './src/config/database';
 import addUser from './src/middleware/addUser';
 import authRouter from "./src/routes/authRouter";
 import uploadRouter from "./src/routes/uploads";
+import diaryRouter from "./src/routes/diaryRouter";
 
 import privateEndpoint from './src/middleware/privateEndpoint';
 import dotenv from "dotenv";
@@ -42,6 +43,7 @@ app.use('/api/static', express.static(__dirname +'/static'));
 app.use(addUser);
 app.use("/api/auth", authRouter);
 app.use("/api/upload", uploadRouter);
+app.use("/api/diary", diaryRouter);
 app.post("/api/test", privateEndpoint, (req, res) => {
   res.send({message: "esti logat inca"});
 });

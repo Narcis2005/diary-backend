@@ -49,6 +49,11 @@ export const Register = async (req: Request, res: Response) => {
             updatedAt: new Date(),
             imagePath: "static/images/profilePlaceholder.png",
         });
+        await user.createDiaryEntry({
+            content: "Modify me to start writing",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
         const [token, refreshToken] = await createTokens(user, SECRET, REFRESH_SECRET + user.password);
         res.set("Access-Control-Expose-Headers", "x-token, x-refresh-token");
         res.set("x-token", token);
@@ -158,6 +163,7 @@ export const Update = async (req: Request, res: Response) => {
         const imagePath = "static/images/" + imageName;
         user.imagePath = imagePath;
     }
+    user.updatedAt = new Date();
     await user.save();
     res.sendStatus(200);
 };
