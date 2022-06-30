@@ -4,6 +4,7 @@ import fs from "fs";
 import multer, { FileFilterCallback } from "multer";
 import sharp from "sharp";
 // https://stackoverflow.com/questions/45154069/display-uploaded-image-with-multer
+import Path from "path";
 
 const storage = multer.memoryStorage();
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback): void => {
@@ -62,7 +63,7 @@ export const Upload = (req: Request, res: Response) => {
                         fs.unlinkSync(req.user.imagePath);
                     }
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    fs.writeFile("static/images/" + fileName, newBuffer, "binary", (error) => {
+                    fs.writeFile(Path.normalize(__dirname + "/static/images/") + fileName, newBuffer, "binary", (error) => {
                         erroWriting = error;
                     });
                     if (!erroWriting) {
