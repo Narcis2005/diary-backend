@@ -20,6 +20,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+      with:
+        clean: "false"
     - name: install dependencies
       run: npm ci
 #   - name: test the code
