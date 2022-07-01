@@ -160,7 +160,7 @@ export const Update = async (req: Request, res: Response) => {
         user.fullName = fullName;
     }
     if (imageName) {
-        const imagePath = "static/images/" + imageName;
+        const imagePath = "static/uploads/images/" + imageName;
         user.imagePath = imagePath;
     }
     user.updatedAt = new Date();

@@ -62,7 +62,7 @@ export const Download = async (req: Request, res: Response) => {
 
     const formatedDiaryEntries = diaryEntries.map((content) => {
         return {
-            content: formatStringsInSubstringsWithNWords(content.content, 240),
+            content: formatStringsInSubstringsWithNWords(content.content, 210),
             date: content.createdAt,
         };
     });
@@ -109,14 +109,15 @@ html, body {
     position: relative;
     width: 90%;
     margin-left: 5%;
-    margin-top: 5%;
+    padding-top: 5%;
     display: block;
     page-break-after: always;
-    height: 90%;
+    height: 94%;
+    overflow: hidden;
     
   }
   .content {
-    height: 95%;
+    height: 91%;
     width: 100%;
     line-height: 40px;
     background: linear-gradient(to bottom, white 39px, rgb(160, 160, 160) 1px);
@@ -136,6 +137,7 @@ html, body {
     justify-content: space-between;
     padding: 10px 0;
     font-size: 23px;
+    height: 5%;
   }
   .footer {
     display: flex;
