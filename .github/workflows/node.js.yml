@@ -15,13 +15,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        clean: "false"
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-      with:
-        clean: "false"
     - name: install dependencies
       run: npm ci
 #   - name: test the code
