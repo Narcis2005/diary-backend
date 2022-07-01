@@ -73,7 +73,7 @@ export const Download = async (req: Request, res: Response) => {
             (content) =>
                 `<div class="page">
                 <div class="header">
-                    <p style="font-weight: 700;">Wrriten by: ${user.username}</p>
+                    <p style="font-weight: 700;"> ${user.username}'s diary</p>
                     <p>${new Date(data.date).toLocaleDateString("en-US", options)}
                 </div>
                 <div class="content">
