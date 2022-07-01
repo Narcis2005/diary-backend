@@ -19,7 +19,7 @@ export const updateDiary = async (req: Request, res: Response) => {
     const diaryEntries = await user.getDiaryEntries();
     const areEntriesValid = await user.hasDiaryEntries(entries.map((entry) => entry.id));
     if (!areEntriesValid) {
-        res.send({ message: "You dont own every entry" });
+        res.send({ message: "You dont own all entry" });
         return;
     }
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
