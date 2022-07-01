@@ -1,0 +1,33 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - name: install dependencies
+      run: npm ci
+#   - name: test the code
+#      run: npm test
+    - name: build the new image
+      run: docker build -t diary-backend-docker .
+    - name: remove the previous container 
+      run: docker rm -f $(docker ps -a | grep diary-backend-docker | cut -c1-10)
+    - name: run the new container
+      run: docker run --user=node --volume=/home/ubuntu/diary-backend/static/uploads/images:/usr/src/app/dist/static/uploads/images:rw --network=host --privileged --restart=unless-stopped --detach=true --name=diary-backend-docker diary-backend-docker 
+
