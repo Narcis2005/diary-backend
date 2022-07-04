@@ -49,7 +49,6 @@ export const refreshTokens = async (refreshToken: string, SECRET: string, SECRET
     if (!user) {
         return {};
     }
-
     const refreshSecret = SECRET_2 + user.password;
 
     try {
