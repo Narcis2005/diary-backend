@@ -3,12 +3,47 @@ import { Request, Response } from "express";
 import User from "../models/user";
 export const getDiary = async (req: Request, res: Response) => {
     const user = await User.findByPk(req.user.id);
-    res.send(await user.getDiaryEntries());
+    const userEntries = await user.getDiaryEntries();
+    const decryptedEntries = userEntries.map((entry) => ({
+        id: entry.id,
+        updatedAt: entry.updatedAt,
+        createdAt: entry.createdAt,
+        userId: entry.userId,
+        content: decryptContent({ content: entry.content, id: user.id.toString(), secret: process.env.DIARY_SECRET }),
+    }));
+    res.send(decryptedEntries);
 };
 import htmlToPdf from "convert-html-to-pdf";
 import { Readable } from "stream";
+import crypto from "crypto";
+interface IEncryptContent {
+    content: string;
+    id: string;
+    secret: string;
+}
+
+export const encryptContent = ({ content, id, secret }: IEncryptContent): string => {
+    const iv = crypto.randomBytes(16);
+    const password = (id + secret).substring(0, 32);
+    const cipher = crypto.createCipheriv("aes-256-cbc", Buffer.from(password), iv);
+    let encrypted = cipher.update(content);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString("hex") + ":" + encrypted.toString("hex");
+};
+
+export const decryptContent = ({ content, id, secret }: IEncryptContent): string => {
+    const textParts = content.split(":");
+    const iv = Buffer.from(textParts.shift(), "hex");
+    const encryptedText = Buffer.from(textParts.join(":"), "hex");
+    const password = (id + secret).substring(0, 32);
+    const decipher = crypto.createDecipheriv("aes-256-cbc", Buffer.from(password), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+};
 export const updateDiary = async (req: Request, res: Response) => {
     interface IEntry {
+        data: Date;
         id: number;
         content: string;
         date: Date;
@@ -26,11 +61,20 @@ export const updateDiary = async (req: Request, res: Response) => {
     entries.forEach(async (entry) => {
         if (!entry.isNewEntry) {
             const diaryEntry = diaryEntries.filter((e) => (e.id = entry.id));
-            diaryEntry[0].content = entry.content;
+            diaryEntry[0].content = encryptContent({
+                content: entry.content,
+                id: user.id.toString(),
+                secret: process.env.DIARY_SECRET,
+            });
+            diaryEntry[0].updatedAt = entry.data;
             await diaryEntry[0].save();
         } else {
             await user.createDiaryEntry({
-                content: entry.content,
+                content: encryptContent({
+                    content: entry.content,
+                    id: user.id.toString(),
+                    secret: process.env.DIARY_SECRET,
+                }),
                 createdAt: entry.date,
                 updatedAt: entry.date,
             });
@@ -62,7 +106,10 @@ export const Download = async (req: Request, res: Response) => {
 
     const formatedDiaryEntries = diaryEntries.map((content) => {
         return {
-            content: formatStringsInSubstringsWithNWords(content.content, 210),
+            content: formatStringsInSubstringsWithNWords(
+                decryptContent({ content: content.content, id: user.id.toString(), secret: process.env.DIARY_SECRET }),
+                210,
+            ),
             date: content.createdAt,
         };
     });

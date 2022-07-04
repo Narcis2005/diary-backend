@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { createTokens } from "../utils/auth";
 import dotenv from "dotenv";
+import { encryptContent } from "./diary";
 dotenv.config();
 export const Register = async (req: Request, res: Response) => {
     interface IData {
@@ -50,7 +51,11 @@ export const Register = async (req: Request, res: Response) => {
             imagePath: "static/images/profilePlaceholder.png",
         });
         await user.createDiaryEntry({
-            content: "Modify me to start writing",
+            content: encryptContent({
+                content: "Modify me to start writing",
+                id: user.id.toString(),
+                secret: process.env.DIARY_SECRET,
+            }),
             createdAt: new Date(),
             updatedAt: new Date(),
         });

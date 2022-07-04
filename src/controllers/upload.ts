@@ -63,9 +63,14 @@ export const Upload = (req: Request, res: Response) => {
                         fs.unlinkSync(Path.normalize(__dirname + "/../../" + req.user.imagePath));
                     }
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                    fs.writeFile(Path.normalize(__dirname + "/../../static/uploads/images/") + fileName, newBuffer, "binary", (error) => {
-                        erroWriting = error;
-                    });
+                    fs.writeFile(
+                        Path.normalize(__dirname + "/../../static/uploads/images/") + fileName,
+                        newBuffer,
+                        "binary",
+                        (error) => {
+                            erroWriting = error;
+                        },
+                    );
                     if (!erroWriting) {
                         res.send(fileName);
                         return;
