@@ -54,7 +54,7 @@ export const updateDiary = async (req: Request, res: Response) => {
     const diaryEntries = await user.getDiaryEntries();
     const areEntriesValid = await user.hasDiaryEntries(entries.map((entry) => entry.id));
     if (!areEntriesValid) {
-        res.send({ message: "You dont own all entry" });
+        res.send({ message: "You dont own all entries" });
         return;
     }
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -66,7 +66,7 @@ export const updateDiary = async (req: Request, res: Response) => {
                 id: user.id.toString(),
                 secret: process.env.DIARY_SECRET,
             });
-            diaryEntry[0].updatedAt = entry.data;
+            diaryEntry[0].updatedAt = new Date();
             await diaryEntry[0].save();
         } else {
             await user.createDiaryEntry({
@@ -103,7 +103,6 @@ const formatStringsInSubstringsWithNWords = (string: string, n: number): IPageCo
 export const Download = async (req: Request, res: Response) => {
     const user = await User.findByPk(req.user.id);
     const diaryEntries = await user.getDiaryEntries();
-
     const formatedDiaryEntries = diaryEntries.map((content) => {
         return {
             content: formatStringsInSubstringsWithNWords(

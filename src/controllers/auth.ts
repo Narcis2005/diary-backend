@@ -5,6 +5,8 @@ import { Request, Response } from "express";
 import { createTokens } from "../utils/auth";
 import dotenv from "dotenv";
 import { encryptContent } from "./diary";
+import fs from "fs";
+import Path from "path";
 dotenv.config();
 export const Register = async (req: Request, res: Response) => {
     interface IData {
@@ -166,7 +168,13 @@ export const Update = async (req: Request, res: Response) => {
     }
     if (imageName) {
         const imagePath = "static/uploads/images/" + imageName;
-        user.imagePath = imagePath;
+        try {
+            if(fs.existsSync(Path.normalize(__dirname + "/../../" + imagePath))) {
+                user.imagePath = imagePath;
+            }
+        } catch (error) {
+            res.status(403).send({message: "The image does not exists on server. You need to upload it first"});
+        }
     }
     user.updatedAt = new Date();
     await user.save();

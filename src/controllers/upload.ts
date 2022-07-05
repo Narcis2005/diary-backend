@@ -59,9 +59,14 @@ export const Upload = (req: Request, res: Response) => {
                     const fileName = Date.now().toString() + ".webp";
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    if (req.user.imagePath !== "static/images/profilePlaceholder.png") {
-                        fs.unlinkSync(Path.normalize(__dirname + "/../../" + req.user.imagePath));
+                    try {
+                        if (req.user.imagePath !== "static/images/profilePlaceholder.png") {
+                            fs.unlinkSync(Path.normalize(__dirname + "/../../" + req.user.imagePath));
+                        }
+                    } catch (error) {
+                        console.log(error);
                     }
+                   
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     fs.writeFile(
                         Path.normalize(__dirname + "/../../static/uploads/images/") + fileName,
