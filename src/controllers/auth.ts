@@ -7,7 +7,8 @@ import dotenv from "dotenv";
 import { encryptContent } from "./diary";
 import fs from "fs";
 import Path from "path";
-dotenv.config();
+import config from "../config/env";
+dotenv.config(config);
 export const Register = async (req: Request, res: Response) => {
     interface IData {
         fullName: string;
@@ -169,11 +170,11 @@ export const Update = async (req: Request, res: Response) => {
     if (imageName) {
         const imagePath = "static/uploads/images/" + imageName;
         try {
-            if(fs.existsSync(Path.normalize(__dirname + "/../../" + imagePath))) {
+            if (fs.existsSync(Path.normalize(__dirname + "/../../" + imagePath))) {
                 user.imagePath = imagePath;
             }
         } catch (error) {
-            res.status(403).send({message: "The image does not exists on server. You need to upload it first"});
+            res.status(403).send({ message: "The image does not exists on server. You need to upload it first" });
         }
     }
     user.updatedAt = new Date();

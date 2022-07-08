@@ -66,7 +66,7 @@ export const Upload = (req: Request, res: Response) => {
                     } catch (error) {
                         console.log(error);
                     }
-                   
+
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                     fs.writeFile(
                         Path.normalize(__dirname + "/../../static/uploads/images/") + fileName,

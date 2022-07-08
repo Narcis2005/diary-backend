@@ -7,8 +7,7 @@ import uploadRouter from "./src/routes/uploads";
 import diaryRouter from "./src/routes/diaryRouter";
 import checkEnv from './src/utils/checkEnv';
 
-const app:Application = express();
-
+export const app:Application = express();
 app.use(express.json());
 app.use(express.urlencoded({
   extended: true
@@ -16,10 +15,9 @@ app.use(express.urlencoded({
 
 app.use(cors());
 checkEnv();
-database.authenticate()
+database.sync({force: true})
   .then(() => console.log("connected to postgres"))
   .catch((err) => console.log(err));
-
 app.use('/api/static', express.static(__dirname +'/static'));
 app.use(addUser);
 app.use("/api/auth", authRouter);
@@ -31,7 +29,8 @@ const PORT = process.env.PORT || 3026;
 
 
 //Listening on the PORT variable and then console logging the port
-
-app.listen(PORT, () =>{
+if(process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () =>{
     console.log(`Listening on port ${PORT}`);
 });
+}

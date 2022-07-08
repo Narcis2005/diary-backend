@@ -3,7 +3,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/user";
 import { IJWTDecode, refreshTokens } from "../utils/auth";
 import dotenv from "dotenv";
-dotenv.config();
+import config from "../config/env";
+dotenv.config(config);
 const SECRET = process.env.SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const addUser = async (req: Request, res: Response, next: NextFunction) => {
