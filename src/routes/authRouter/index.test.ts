@@ -6,10 +6,11 @@ import { expect } from "chai";
 import User from "../../models/user";
 describe("Auth router", () => {
     let token = "";
+
     after(async () => {
         await User.destroy({ where: { username: "John" } });
     });
-    describe("POST api/auth/regitser", () => {
+    describe("POST api/auth/register", () => {
         it("Should return a code 400 because no params were specified", async () => {
             const res = await Require(app).post("/api/auth/register").send({});
             expect(res.statusCode).to.be.equal(400);
@@ -90,6 +91,7 @@ describe("Auth router", () => {
                 username: "John",
                 password: "fjsdfj",
             });
+
             expect(res.statusCode).to.be.equal(200);
             expect(res.headers["x-token"]).to.be.a("string");
             expect(res.headers["x-refresh-token"]).to.be.a("string");

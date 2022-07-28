@@ -28,7 +28,7 @@
     "lint:fix": "eslint --fix src/**/*.ts ",
     "build": "tsc --build && cp .env ./dist",
     "prettier-format": "prettier --config .prettierrc.js src/**/*.ts --write",
-    "test": "SET NODE_ENV=test&& ts-mocha -p ./tsconfig.json src/**/*.test.ts"
+    "test": "SET NODE_ENV=test&& ts-mocha -p ./tsconfig.json test.ts"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",

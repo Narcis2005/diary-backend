@@ -69,5 +69,6 @@ User.hasMany(DiaryEntry, {
     sourceKey: "id",
     foreignKey: "userId",
     as: "diaryEntries",
+    onDelete: "cascade",
 });
 export default User;

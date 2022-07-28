@@ -30,7 +30,7 @@ describe("Diary router", () => {
     });
     // describe("PUT api/diary/update",  () => {
     //     it("Should return the diary with status code 200", async () => {
-    //         const res = await Require(app).get("/api/diary").set({
+    //         const res = await Require(app).put("/api/diary/update").set({
     //             "x-token": token
     //         });
     //         expect(res.statusCode).to.be.equal(200);

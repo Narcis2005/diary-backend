@@ -2,6 +2,7 @@
 import express from "express";
 import { updateDiary, getDiary, Download } from "../../controllers/diary";
 import privateEndpoint from "../../middleware/privateEndpoint";
+
 const router = express.Router();
 
 // @router  GET api/diary
