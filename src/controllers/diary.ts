@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import User from "../models/user";
 export const getDiary = async (req: Request, res: Response) => {
     const user = await User.findByPk(req.user.id);
-    const userEntries = await user.getDiaryEntries();
+    const userEntries = await user.getDiaryEntries({order: ["createdAt"]});
     const decryptedEntries = userEntries.map((entry) => ({
         id: entry.id,
         updatedAt: entry.updatedAt,
@@ -52,7 +52,7 @@ export const updateDiary = async (req: Request, res: Response) => {
     const entries = req.body.entries as IEntry[];
     const user = await User.findByPk(req.user.id);
     const diaryEntries = await user.getDiaryEntries();
-    const areEntriesValid = await user.hasDiaryEntries(entries.map((entry) => entry.id));
+    const areEntriesValid = await user.hasDiaryEntries(entries.filter(entry => !entry.isNewEntry).map((entry) => entry.id));
     if (!areEntriesValid) {
         res.send({ message: "You dont own all entries" });
         return;
@@ -60,7 +60,8 @@ export const updateDiary = async (req: Request, res: Response) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     entries.forEach(async (entry) => {
         if (!entry.isNewEntry) {
-            const diaryEntry = diaryEntries.filter((e) => (e.id = entry.id));
+
+            const diaryEntry = diaryEntries.filter((e) => (e.id == entry.id));
             diaryEntry[0].content = encryptContent({
                 content: entry.content,
                 id: user.id.toString(),

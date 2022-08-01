@@ -20,7 +20,7 @@ DiaryEntry.init(
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
         content: {
-            type: new DataTypes.STRING(),
+            type: new DataTypes.TEXT(),
             allowNull: true,
         },
     },
