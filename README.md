@@ -93,11 +93,99 @@ Required:
 
 #### Response
 
-It will be a json with the following syntax:
+It could be a json with the following syntax, or with no response at all:
 
 ```javascript
 {
     message ?: string,
+}
+```
+
+The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
+
+### POST api/login - public
+
+You login
+
+#### Parameters
+
+Required:
+
+-   username: the username of the user
+-   password: the password of the user
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+    id?: number,
+    fullName?: string,
+    email?: string;
+    imageURL?: string;
+}
+```
+
+The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
+
+### GET api/getuser - public
+
+You get the user info based on token
+
+#### Parameters
+
+Required:
+
+-   headers:
+    -   x-token: the token auth
+
+Optional:
+
+-   headers:
+    -   x-refresh-token: if the token is expired use this to generate a new one
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+    id?: number,
+    fullName?: string,
+    email?: string;
+    imageURL?: string;
+}
+```
+
+The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
+
+### PUT api/update - private
+
+Update the user info
+
+#### Parameters
+
+Required:
+
+-   At least one of the optional parameteres
+
+Optional:
+
+-   username
+-   fullName
+-   email
+-   imageName - if you want to change the image, you first need to call another endpoint to upload the image
+
+#### Response
+
+It could be a json with the following syntax, or with no response at all:
+
+```typescript
+{
+    message?: string,
 }
 ```
 

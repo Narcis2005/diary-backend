@@ -63,6 +63,24 @@ export const updateDiary = async (req: Request, res: Response) => {
     entries.forEach(async (entry) => {
         if (!entry.isNewEntry) {
             const diaryEntry = diaryEntries.filter((e) => e.id == entry.id);
+            //If the user deleted all content in that specific day, delete the entry
+            if(entry.content == "") {
+                await diaryEntry[0].destroy();
+                const currentEntries = await user.getDiaryEntries();
+                //if the user tries to delete all entries, create one
+                if(currentEntries.length === 0) {
+                    await user.createDiaryEntry({
+                        content: encryptContent({
+                            content: "Modify me to start writing",
+                            id: user.id.toString(),
+                            secret: process.env.DIARY_SECRET,
+                        }),
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    });
+                }
+                return;
+            }
             diaryEntry[0].content = encryptContent({
                 content: entry.content,
                 id: user.id.toString(),
@@ -104,7 +122,7 @@ const formatStringsInSubstringsWithNWords = (string: string, n: number): IPageCo
 
 export const Download = async (req: Request, res: Response) => {
     const user = await User.findByPk(req.user.id);
-    const diaryEntries = await user.getDiaryEntries();
+    const diaryEntries = await user.getDiaryEntries({ order: ["createdAt"] });
     const formatedDiaryEntries = diaryEntries.map((content) => {
         return {
             content: formatStringsInSubstringsWithNWords(
