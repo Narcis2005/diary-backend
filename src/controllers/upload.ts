@@ -31,7 +31,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
 const upload = multer({ storage, fileFilter, limits: { fileSize: 5242880 } }).single("file");
 
 export const Upload = (req: Request, res: Response) => {
-    // console.log("it recevied");
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {

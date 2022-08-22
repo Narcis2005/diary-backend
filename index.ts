@@ -6,7 +6,7 @@ import authRouter from "./src/routes/authRouter";
 import uploadRouter from "./src/routes/uploads";
 import diaryRouter from "./src/routes/diaryRouter";
 import checkEnv from './src/utils/checkEnv';
-
+import contactRouter from "./src/routes/contactRouter";
 export const app:Application = express();
 app.use(express.json());
 app.use(express.urlencoded({
@@ -23,6 +23,7 @@ app.use(addUser);
 app.use("/api/auth", authRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/diary", diaryRouter);
+app.use("/api/contact", contactRouter);
 //Creating port variable from env variable or setting it mannualy
 
 const PORT = process.env.PORT || 3026;

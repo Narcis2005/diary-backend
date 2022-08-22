@@ -179,11 +179,11 @@ html, body {
     display: block;
     page-break-after: always;
     height: 94%;
-    overflow: hidden;
+    // overflow: hidden;
     
   }
   .content {
-    height: 91%;
+    height: 93%;
     width: 100%;
     line-height: 40px;
     background: linear-gradient(to bottom, white 39px, rgb(160, 160, 160) 1px);

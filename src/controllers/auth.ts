@@ -8,6 +8,9 @@ import { encryptContent } from "./diary";
 import fs from "fs";
 import Path from "path";
 import config from "../config/env";
+import emailTransporter from "../utils/emailTransporter";
+import jwt from "jsonwebtoken";
+
 dotenv.config(config);
 export const Register = async (req: Request, res: Response) => {
     interface IData {
@@ -180,4 +183,150 @@ export const Update = async (req: Request, res: Response) => {
     user.updatedAt = new Date();
     await user.save();
     res.sendStatus(200);
+};
+export const sendDeleteAccountEmail = async  (req: Request, res: Response) => {
+    interface IBody {
+        password: string;
+    }
+    const {password} = req.body as IBody;
+    const valid = await bcrypt.compare(password, req.user.password);
+    if (!valid) {
+        res.status(403).send({ message: "Your password is incorect. If you forgot your password you can change it" });
+        return;
+    }
+    const jwtToken = jwt.sign({user: {id: req.user.id}}, process.env.DELETE_TOKEN, {expiresIn: "1h"});
+    const link = process.env.NODE_ENV === "production" ? `https://diary.chirilovnarcis.ro/profile/delete/${jwtToken}` : `http://localhost:3000/profile/delete/${jwtToken}`;
+    const messageToSend = {
+        to: req.user.email,
+        from: "Diary - Your safe place",
+        subject: "Delete your account",
+        html: `Hi! We are very sorry that you choose to delete your account. You can ignore this email and contiune writing. If you still choose to delete it, follow <a href=${link}>this link</a> . The link is valid for 1 hour.`   
+    };
+    
+        emailTransporter.sendMail(messageToSend, (error, info) => {
+        if (error) {
+             res.status(500).send({message: "There is a problem with the system right now. Try again later or simply contact me at contact@chirilovnarcis.ro"});
+
+            console.log(error);
+            throw error;
+        }
+        console.log("Message sent: %s", info.messageId);
+    });
+    res.send({message: "An email with instructions has been send to the email adress linked with this account"});
+};
+export const deleteAccount = async (req: Request, res: Response) => {
+
+    interface IJWTUser {
+        user: {id: string};
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const token = req.body.token as string;
+    if(!token) {
+        res.status(400).send({message: "Specify the token please"});
+        return;
+    }
+    try {
+        const {user} = jwt.verify(token, process.env.DELETE_TOKEN) as IJWTUser;
+        const findedUser = await User.findByPk(user.id);
+        await findedUser.destroy();
+        res.send({message: "Account deleted sucesfully"});
+        return;
+    } catch (error) {
+        res.status(400).send({message: "please specify a valid token and be sure the user still exists", error: error});
+        return;
+    }
+
+
+ };
+ export const sendResetPasswordEmail =  (req: Request, res: Response) => {
+    const jwtToken = jwt.sign({user: {id: req.user.id}}, process.env.RESET_TOKEN, {expiresIn: "1h"});
+    const link = process.env.NODE_ENV === "production" ? `https://diary.chirilovnarcis.ro/profile/reset-password/${jwtToken}` : `http://localhost:3000/profile/reset-password/${jwtToken}`;
+    const messageToSend = {
+        to: req.user.email,
+        from: "Diary - Your safe place",
+        subject: "Reset your password",
+        html: `Hi! You need to follow <a href=${link}>this link</a> to change your password. The link is valid for 1 hour. If you didn't ask for password reset, just ignore this email.`   
+    };
+    
+        emailTransporter.sendMail(messageToSend, (error, info) => {
+        if (error) {
+             res.status(500).send({message: "There is a problem with the system right now. Try again later or simply contact me at contact@chirilovnarcis.ro"});
+
+            console.log(error);
+            throw error;
+        }
+        console.log("Message sent: %s", info.messageId);
+    });
+    res.send({message: "An email with instructions has been send to the email adress linked with this account"});
+};
+export const resetPassword = async (req: Request, res: Response) => {
+    interface IBody {
+        newPassword: string;
+        repeatedNewPassword: string;
+        token: string;
+    }
+    interface IJWTUser {
+        user: {id: string};
+    }
+    const {newPassword, repeatedNewPassword, token} = req.body as IBody;
+    if(!newPassword || !repeatedNewPassword || !token) {
+        res.status(400).send({message: "Please specify all parameters: newPassword, newRepeteadPassword, token"});
+        return;
+    }
+    if(newPassword !== repeatedNewPassword) {
+        res.status(400).send({message: "The passwords don't match"});
+        return;
+    }
+    try {
+        const {user} = jwt.verify(token, process.env.RESET_TOKEN) as IJWTUser;
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const findedUser = await User.findByPk(user.id);
+        findedUser.password = hashedPassword;
+        findedUser.updatedAt = new Date();
+        await findedUser.save();
+        res.send({message: "Password updated succesfully"});
+        return;
+    } catch (error) {
+        res.status(400).send({message: "Please specify a valid token and be sure the user still exists", error: error});
+        return;
+    }
+
+};
+export const forgottenPassword = async (req: Request, res: Response) => { 
+    interface IBody {
+        email: string;
+    }
+    const {email} = req.body as IBody;
+    if(!email) {
+        res.status(400).send({message: "Specify the email parameter"});
+        return;
+    }
+    const users = await User.findAll({where: {email: email}});
+    if (users.length === 0) {
+        res.send({message: "An email with further actions was send, if there was an account linked to this email"});
+        return;
+    }
+    const messageForEveryAccount = users.map( user => {
+        const jwtToken =  jwt.sign({user: {id: user.id}}, process.env.RESET_TOKEN, {expiresIn: "1h"});
+        const link = process.env.NODE_ENV === "production" ? `https://diary.chirilovnarcis.ro/profile/reset-password/${jwtToken}` : `http://localhost:3000/profile/reset-password/${jwtToken}`;
+        return `User: ${user.username} - <a href=${link}>Follow this</a> </br>`;
+    });
+    const message = `Hi. Follow the link for the account which password needs to be reseted </br> ${messageForEveryAccount}`;
+    const messageToSend = {
+        to: email,
+        from: "Diary - Your safe place",
+        subject: "You forgot your password",
+        html: message  
+    };
+    
+        emailTransporter.sendMail(messageToSend, (error, info) => {
+        if (error) {
+             res.status(500).send({message: "There is a problem with the system right now. Try again later or simply contact me at contact@chirilovnarcis.ro"});
+
+            console.log(error);
+            throw error;
+        }
+        console.log("Message sent: %s", info.messageId);
+    });
+    res.send({message: "An email with further actions was send, if there was an account linked to this email"});
 };

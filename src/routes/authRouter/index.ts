@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import express from "express";
-import { getUser, Login, Register, Update } from "../../controllers/auth";
+import { deleteAccount, forgottenPassword, getUser, Login, Register, resetPassword, sendDeleteAccountEmail, sendResetPasswordEmail, Update } from "../../controllers/auth";
 import privateEndpoint from "../../middleware/privateEndpoint";
 const router = express.Router();
 
@@ -23,4 +23,11 @@ router.get("/getuser", getUser);
 // @desc    Update the username, profile photo, email or full name
 // @access  Private
 router.put("/update", privateEndpoint, Update);
+
+
+router.post("/send-delete-account-email", privateEndpoint, sendDeleteAccountEmail);
+router.post("/send-reset-password-email", privateEndpoint, sendResetPasswordEmail);
+router.put("/reset-password", resetPassword);
+router.delete("/delete", deleteAccount);
+router.post("/forgot-password", forgottenPassword);
 export default router;
