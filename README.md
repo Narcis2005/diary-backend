@@ -13,15 +13,18 @@ Diary is a web application where you can let your emotions fly, by writing them 
 -   Automatic formating of content is pages on diary save
 -   Responsive design
 -   Server side rendering
+-   Change password
+-   Forgot password
+-   Delete account
 
 ## Upcoming features
 
 -   Customize your diary design
--   Delete account
 -   Google, Facebook auth
 -   More testing
--   Change password
 -   Rich text editor (maybe)
+-   Recaptcha
+-   Analytics
 
 ## Tech
 
@@ -60,6 +63,11 @@ DB_USERNAME= username of db
 DB_PASSWORD= password of db
 DATABASE_NAME= name of db
 DIARY_SECRET= secret for encrypting diary content
+EMAIL_ADRESS= gmail email adress
+REFRESH_TOKEN_EMAIL= refresh token linked to gmail account
+CLIENT_ID_EMAIL= client id for gmail account
+DELETE_TOKEN= jwt secret for delete account
+RESET_TOKEN= jwt secret for reset password
 ```
 
 #### With simple npm
@@ -78,7 +86,9 @@ docker run --user=node --volume=YOUR ABSOLUTE PATH TO THE FOLDER WHERE IMAGES WI
 
 ## API
 
-### POST api/register - public
+### "Access private" means that the authorization header(s) need to exist and be valid
+
+### POST api/auth/register - public
 
 You can create an account
 
@@ -103,7 +113,7 @@ It could be a json with the following syntax, or with no response at all:
 
 The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
 
-### POST api/login - public
+### POST api/auth/login - public
 
 You login
 
@@ -130,7 +140,7 @@ It will be a json with the following syntax:
 
 The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
 
-### GET api/getuser - public
+### GET api/auth/getuser - public
 
 You get the user info based on token
 
@@ -162,7 +172,7 @@ It will be a json with the following syntax:
 
 The response headers will have 2 more proprieties if everything is succesfull: `x-token` and `x-refresh-token` .
 
-### PUT api/update - private
+### PUT api/auth/update - private
 
 Update the user info
 
@@ -188,6 +198,191 @@ It could be a json with the following syntax, or with no response at all:
     message?: string,
 }
 ```
+
+### POST api/auth/send-delete-account-email - private
+
+Sends an email with a delete account link to the email linked with the account
+
+#### Parameters
+
+Required:
+
+-   password - the password of the account
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### POST api/auth/send-reset-password-email - private
+
+Sends an email with a reset password link to the email linked with the account
+
+#### Parameters
+
+none
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### PUT api/auth/reset-password - public
+
+After recevieng an email with a link that calls this endpoint, you can reset your password.
+
+#### Parameters
+
+Required:
+
+-   newPassword - your new password
+-   repeatedNewPassword - the same new password
+-   token - the token from the url received on email
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### DELETE api/auth/delete - public
+
+After recevieng an email with a link that calls this endpoint, you can delete your account.
+
+#### Parameters
+
+Required:
+
+-   token - the token from the url received on email
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### POST api/contact - public
+
+Send me an email
+
+#### Parameters
+
+Required:
+
+-   email: The user's email;
+-   fullName: The user's fullName;
+-   subject: The user's subject;
+-   message: The user's message;
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### GET api/diary - private
+
+Get the diary of an user
+
+#### Parameters
+
+none
+
+#### Response
+
+It will be a json array with the following syntax:
+
+```typescript
+[
+    {
+        id: string,
+        updatedAt: Date,
+        createdAt: Date,
+        userId: string,
+        content: string,
+    },
+];
+```
+
+### PUT api/diary/update-diary - private
+
+Update the diary.
+
+#### Parameters
+
+Required:
+
+Representing an array of diaryEntries that you wish to change
+
+[{
+
+-   data: Date;
+-   id: number;
+-   content: string;
+-   date: Date;
+-   isNewEntry: boolean,
+
+}]
+
+#### Response
+
+It will be a json with the following syntax:
+
+```typescript
+{
+    message: string,
+}
+```
+
+### GET api/diary/download - private
+
+Download your diary in pdf
+
+#### Parameters
+
+none
+
+#### Response
+
+It will be a pdf.
+
+### POST api/upload - private
+
+Upload a photo for the profile picture.
+
+#### Parameters
+
+It's a form-data request
+
+Required:
+
+file: the actual file in png, jpg or webp
+
+#### Response
+
+A string with the photo name.
 
 ## License
 
