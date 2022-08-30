@@ -11,18 +11,19 @@ CREATE TABLE IF NOT EXISTS public.users
     "createdAt" timestamp with time zone,
     "updatedAt" timestamp with time zone,
     CONSTRAINT users_pkey PRIMARY KEY (id)
-)
+);
 -- table "diaryEntries"
 CREATE TABLE IF NOT EXISTS public."diaryEntries"
 (
-    id serial NOT NULL DEFAULT,
-    "createdAt" timestamp with time zone,
-    "updatedAt" timestamp with time zone,
-    content text COLLATE pg_catalog."default",
+    id serial,
     "userId" integer,
-    CONSTRAINT "diaryEntries_pkey" PRIMARY KEY (id),
-    CONSTRAINT "diaryEntries_userId_fkey" FOREIGN KEY ("userId")
+    content text COLLATE pg_catalog."default",
+    "createdAt" date,
+    "updatedAt" date,
+    CONSTRAINT "diaryEntry_pkey" PRIMARY KEY (id),
+    CONSTRAINT "userId" FOREIGN KEY ("userId")
         REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-)
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);

@@ -105,3 +105,4 @@ dist
 
 static/uploads
 docker-run-command
+db

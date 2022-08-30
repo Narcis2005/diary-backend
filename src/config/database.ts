@@ -7,6 +7,7 @@ const database = new Sequelize(process.env.DATABASE_NAME, process.env.DB_USERNAM
     host: process.env.DB_HOST,
     dialect: "postgres",
     logging: false,
+    port: Number(process.env.DB_PORT)
 });
 
 export default database;
